@@ -44,77 +44,52 @@ if __name__ == "__main__":
     if args.listen:
         server_name = '0.0.0.0'
         
-        
-
-    def audio_recog(audio_input, sd_switch, hotwords, output_dir):
-        return audio_clipper.recog(audio_input, sd_switch, None, hotwords, output_dir=output_dir)
 
     def video_recog(video_input, sd_switch, hotwords, output_dir):
         return audio_clipper.video_recog(video_input, sd_switch, hotwords, output_dir=output_dir)
 
     def video_clip(dest_text, video_spk_input, start_ost, end_ost, state, output_dir):
-        return audio_clipper.video_clip(
-            dest_text, start_ost, end_ost, state, dest_spk=video_spk_input, output_dir=output_dir
-            )
+        return audio_clipper.video_clip(dest_text, start_ost, end_ost, state, dest_spk=video_spk_input, output_dir=output_dir)
 
-    def mix_recog(video_input, audio_input, hotwords, output_dir):
+    def mix_recog(video_input, hotwords, output_dir):
         output_dir = output_dir.strip()
         if not len(output_dir):
             output_dir = None
         else:
             output_dir = os.path.abspath(output_dir)
-        audio_state, video_state = None, None
+        video_state = None
         if video_input is not None:
-            res_text, res_srt, video_state = video_recog(
-                video_input, 'No', hotwords, output_dir=output_dir)
+            res_text, res_srt, video_state = video_recog(video_input, 'No', hotwords, output_dir=output_dir)
             return res_text, res_srt, video_state, None
-        if audio_input is not None:
-            res_text, res_srt, audio_state = audio_recog(
-                audio_input, 'No', hotwords, output_dir=output_dir)
-            return res_text, res_srt, None, audio_state
-    
-    def mix_recog_speaker(video_input, audio_input, hotwords, output_dir):
+
+    def mix_recog_speaker(video_input, hotwords, output_dir):
         output_dir = output_dir.strip()
         if not len(output_dir):
             output_dir = None
         else:
             output_dir = os.path.abspath(output_dir)
-        audio_state, video_state = None, None
+        video_state = None
         if video_input is not None:
-            res_text, res_srt, video_state = video_recog(
-                video_input, 'Yes', hotwords, output_dir=output_dir)
+            res_text, res_srt, video_state = video_recog(video_input, 'Yes', hotwords, output_dir=output_dir)
             return res_text, res_srt, video_state, None
-        if audio_input is not None:
-            res_text, res_srt, audio_state = audio_recog(
-                audio_input, 'Yes', hotwords, output_dir=output_dir)
-            return res_text, res_srt, None, audio_state
-    
-    def mix_clip(dest_text, video_spk_input, start_ost, end_ost, video_state, audio_state, output_dir):
+
+    def mix_clip(dest_text, video_spk_input, start_ost, end_ost, video_state, output_dir):
         output_dir = output_dir.strip()
         if not len(output_dir):
             output_dir = None
         else:
             output_dir = os.path.abspath(output_dir)
         if video_state is not None:
-            clip_video_file, message, clip_srt = audio_clipper.video_clip(
-                dest_text, start_ost, end_ost, video_state, dest_spk=video_spk_input, output_dir=output_dir)
+            clip_video_file, message, clip_srt = audio_clipper.video_clip(dest_text, start_ost, end_ost, video_state, dest_spk=video_spk_input, output_dir=output_dir)
             return clip_video_file, None, message, clip_srt
-        if audio_state is not None:
-            (sr, res_audio), message, clip_srt = audio_clipper.clip(
-                dest_text, start_ost, end_ost, audio_state, dest_spk=video_spk_input, output_dir=output_dir)
-            return None, (sr, res_audio), message, clip_srt
-    
+
     def video_clip_addsub(dest_text, video_spk_input, start_ost, end_ost, state, output_dir, font_size, font_color):
         output_dir = output_dir.strip()
         if not len(output_dir):
             output_dir = None
         else:
             output_dir = os.path.abspath(output_dir)
-        return audio_clipper.video_clip(
-            dest_text, start_ost, end_ost, state, 
-            font_size=font_size, font_color=font_color, 
-            add_sub=True, dest_spk=video_spk_input, output_dir=output_dir
-            )
+        return audio_clipper.video_clip(dest_text, start_ost, end_ost, state, font_size=font_size, font_color=font_color, add_sub=True, dest_spk=video_spk_input, output_dir=output_dir)
         
     def llm_inference(system_content, user_content, srt_text, model, apikey):
         SUPPORT_LLM_PREFIX = ['qwen', 'gpt', 'g4f', 'moonshot', 'deepseek']
@@ -126,10 +101,9 @@ if __name__ == "__main__":
             model = "-".join(model.split('-')[1:])
             return g4f_openai_call(model, system_content, user_content+'\n'+srt_text)
         else:
-            logging.error("LLM name error, only {} are supported as LLM name prefix."
-                          .format(SUPPORT_LLM_PREFIX))
+            logging.error("LLM name error, only {} are supported as LLM name prefix.".format(SUPPORT_LLM_PREFIX))
     
-    def AI_clip(LLM_res, dest_text, video_spk_input, start_ost, end_ost, video_state, audio_state, output_dir):
+    def AI_clip(LLM_res, dest_text, video_spk_input, start_ost, end_ost, video_state, output_dir):
         timestamp_list = extract_timestamps(LLM_res)
         output_dir = output_dir.strip()
         if not len(output_dir):
@@ -137,17 +111,10 @@ if __name__ == "__main__":
         else:
             output_dir = os.path.abspath(output_dir)
         if video_state is not None:
-            clip_video_file, message, clip_srt = audio_clipper.video_clip(
-                dest_text, start_ost, end_ost, video_state, 
-                dest_spk=video_spk_input, output_dir=output_dir, timestamp_list=timestamp_list, add_sub=False)
+            clip_video_file, message, clip_srt = audio_clipper.video_clip(dest_text, start_ost, end_ost, video_state, dest_spk=video_spk_input, output_dir=output_dir, timestamp_list=timestamp_list, add_sub=False)
             return clip_video_file, None, message, clip_srt
-        if audio_state is not None:
-            (sr, res_audio), message, clip_srt = audio_clipper.clip(
-                dest_text, start_ost, end_ost, audio_state, 
-                dest_spk=video_spk_input, output_dir=output_dir, timestamp_list=timestamp_list, add_sub=False)
-            return None, (sr, res_audio), message, clip_srt
-    
-    def AI_clip_subti(LLM_res, dest_text, video_spk_input, start_ost, end_ost, video_state, audio_state, output_dir):
+
+    def AI_clip_subti(LLM_res, dest_text, video_spk_input, start_ost, end_ost, video_state, output_dir):
         timestamp_list = extract_timestamps(LLM_res)
         output_dir = output_dir.strip()
         if not len(output_dir):
@@ -155,18 +122,11 @@ if __name__ == "__main__":
         else:
             output_dir = os.path.abspath(output_dir)
         if video_state is not None:
-            clip_video_file, message, clip_srt = audio_clipper.video_clip(
-                dest_text, start_ost, end_ost, video_state, 
-                dest_spk=video_spk_input, output_dir=output_dir, timestamp_list=timestamp_list, add_sub=True)
+            clip_video_file, message, clip_srt = audio_clipper.video_clip(dest_text, start_ost, end_ost, video_state, dest_spk=video_spk_input, output_dir=output_dir, timestamp_list=timestamp_list, add_sub=True)
             return clip_video_file, None, message, clip_srt
-        if audio_state is not None:
-            (sr, res_audio), message, clip_srt = audio_clipper.clip(
-                dest_text, start_ost, end_ost, audio_state, 
-                dest_spk=video_spk_input, output_dir=output_dir, timestamp_list=timestamp_list, add_sub=True)
-            return None, (sr, res_audio), message, clip_srt
-    
+
     # gradio interface
-    theme = gr.Theme.load("funclip/utils/theme.json")
+    theme = gr.Theme.load(os.path.join(os.path.dirname(__file__), "utils", "theme.json"))
     with gr.Blocks(theme=theme) as funclip_service:
         # gr.Markdown(top_md_1)
         # gr.Markdown(top_md_2)
@@ -177,7 +137,6 @@ if __name__ == "__main__":
             with gr.Column():
                 with gr.Row():
                     video_input = gr.Video(label="视频输入 | Video Input")
-                    # audio_input = gr.Audio(label="音频输入 | Audio Input")
                 with gr.Column():
                     gr.Examples(['https://isv-data.oss-cn-hangzhou.aliyuncs.com/ics/MaaS/ClipVideo/%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%A4%9A%E8%AF%BB%E4%B9%A6%EF%BC%9F%E8%BF%99%E6%98%AF%E6%88%91%E5%90%AC%E8%BF%87%E6%9C%80%E5%A5%BD%E7%9A%84%E7%AD%94%E6%A1%88-%E7%89%87%E6%AE%B5.mp4', 
                                  'https://isv-data.oss-cn-hangzhou.aliyuncs.com/ics/MaaS/ClipVideo/2022%E4%BA%91%E6%A0%96%E5%A4%A7%E4%BC%9A_%E7%89%87%E6%AE%B52.mp4', 
@@ -187,9 +146,6 @@ if __name__ == "__main__":
                     gr.Examples(['https://isv-data.oss-cn-hangzhou.aliyuncs.com/ics/MaaS/ClipVideo/%E8%AE%BF%E8%B0%88.mp4'],
                                 [video_input],
                                 label='多说话人示例视频 | Multi-speaker Demo Video')
-                    # gr.Examples(['https://isv-data.oss-cn-hangzhou.aliyuncs.com/ics/MaaS/ClipVideo/%E9%B2%81%E8%82%83%E9%87%87%E8%AE%BF%E7%89%87%E6%AE%B51.wav'],
-                    #             [audio_input],
-                    #             label="示例音频 | Demo Audio")
                     with gr.Column():
                         # with gr.Row():
                             # video_sd_switch = gr.Radio(["No", "Yes"], label="👥区分说话人 Get Speakers", value='No')
@@ -198,8 +154,8 @@ if __name__ == "__main__":
                         with gr.Row():
                             recog_button = gr.Button("👂 识别 | ASR", variant="primary")
                             recog_button2 = gr.Button("👂👫 识别+区分说话人 | ASR+SD")
-                video_text_output = gr.Textbox(label="✏️ 识别结果 | Recognition Result")
-                video_srt_output = gr.Textbox(label="📖 SRT字幕内容 | RST Subtitles")
+                video_text_output = gr.Textbox(label="✏️ 识别结果 | Recognition Result", lines=10)
+                video_srt_output = gr.Textbox(label="📖 SRT字幕内容 | RST Subtitles", lines=10)
             with gr.Column():
                 with gr.Tab("🧠 LLM智能裁剪 | LLM Clipping"):
                     with gr.Column():
@@ -241,101 +197,30 @@ if __name__ == "__main__":
                     font_color = gr.Radio(["black", "white", "green", "red"], label="🌈 字幕颜色 | Subtitle Color", value='white')
                     # font = gr.Radio(["黑体", "Alibaba Sans"], label="字体 Font")
                 video_output = gr.Video(label="裁剪结果 | Video Clipped")
-                # audio_output = gr.Audio(label="裁剪结果 | Audio Clipped")
-                clip_message = gr.Textbox(label="⚠️ 裁剪信息 | Clipping Log")
-                srt_clipped = gr.Textbox(label="📖 裁剪部分SRT字幕内容 | Clipped RST Subtitles")            
+                clip_message = gr.Textbox(label="⚠️ 裁剪信息 | Clipping Log", lines=10)
+                srt_clipped = gr.Textbox(label="📖 裁剪部分SRT字幕内容 | Clipped RST Subtitles", lines=10)
                 
         recog_button.click(mix_recog, 
-                            inputs=[
-                                video_input, 
-                                # audio_input, 
-                                hotwords_input, 
-                                output_dir,
-                            ], 
-                            outputs=[
-                                video_text_output, 
-                                video_srt_output, 
-                                video_state, 
-                                audio_state
-                            ])
+                            inputs=[video_input,hotwords_input,output_dir],
+                            outputs=[video_text_output,video_srt_output,video_state,audio_state])
         recog_button2.click(mix_recog_speaker, 
-                            inputs=[
-                                video_input, 
-                                # audio_input, 
-                                hotwords_input, 
-                                output_dir,
-                            ], 
-                            outputs=[
-                                video_text_output, 
-                                video_srt_output, 
-                                video_state, 
-                                # audio_state
-                            ])
+                            inputs=[video_input,hotwords_input,output_dir,],
+                            outputs=[video_text_output,video_srt_output,video_state])
         clip_button.click(mix_clip, 
-                            inputs=[
-                                video_text_input, 
-                                video_spk_input, 
-                                video_start_ost, 
-                                video_end_ost, 
-                                video_state, 
-                                # audio_state, 
-                                output_dir
-                            ],
-                            outputs=[
-                                video_output, 
-                                # audio_output, 
-                                clip_message, 
-                                srt_clipped
-                            ])
+                            inputs=[video_text_input,video_spk_input,video_start_ost,video_end_ost,video_state,output_dir],
+                            outputs=[video_output,clip_message,srt_clipped])
         clip_subti_button.click(video_clip_addsub, 
-                            inputs=[
-                                video_text_input, 
-                                video_spk_input, 
-                                video_start_ost, 
-                                video_end_ost, 
-                                video_state, 
-                                output_dir, 
-                                font_size, 
-                                font_color,
-                            ], 
-                           outputs=[video_output, clip_message, srt_clipped])
+                            inputs=[video_text_input,video_spk_input,video_start_ost,video_end_ost,video_state,output_dir,font_size,font_color],
+                            outputs=[video_output, clip_message, srt_clipped])
         llm_button.click(llm_inference,
                          inputs=[prompt_head, prompt_head2, video_srt_output, llm_model, apikey_input],
                          outputs=[llm_result])
         llm_clip_button.click(AI_clip, 
-                            inputs=[
-                                llm_result,
-                                video_text_input, 
-                                video_spk_input, 
-                                video_start_ost, 
-                                video_end_ost, 
-                                video_state, 
-                                # audio_state, 
-                                output_dir,
-                            ],
-                            outputs=[
-                                video_output, 
-                                # audio_output, 
-                                clip_message, 
-                                srt_clipped
-                            ])
+                            inputs=[llm_result,video_text_input,video_spk_input,video_start_ost,video_end_ost,video_state,output_dir],
+                            outputs=[video_output,clip_message,srt_clipped])
         llm_clip_subti_button.click(AI_clip_subti, 
-                            inputs=[
-                                llm_result,
-                                video_text_input, 
-                                video_spk_input, 
-                                video_start_ost, 
-                                video_end_ost, 
-                                video_state, 
-                                # audio_state, 
-                                output_dir,
-                            ],
-                            outputs=[
-                                video_output, 
-                                # audio_output, 
-                                clip_message, 
-                                srt_clipped
-                            ])
+                            inputs=[llm_result,video_text_input,video_spk_input,video_start_ost,video_end_ost,video_state,output_dir],
+                            outputs=[video_output,clip_message,srt_clipped])
     
     # start gradio service in local or share
     if args.listen:
