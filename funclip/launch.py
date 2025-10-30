@@ -213,10 +213,11 @@ if __name__ == "__main__":
                                     choices=[
                                         "deepseek-chat"
                                         "qwen-plus",
-                                             "gpt-3.5-turbo", 
-                                             "gpt-3.5-turbo-0125", 
-                                             "gpt-4-turbo",
-                                             "g4f-gpt-3.5-turbo"], 
+                                        "gpt-3.5-turbo", 
+                                        "gpt-3.5-turbo-0125", 
+                                        "gpt-4-turbo",
+                                        "g4f-gpt-3.5-turbo"
+                                    ], 
                                     value="deepseek-chat",
                                     label="LLM Model Name",
                                     allow_custom_value=True)
