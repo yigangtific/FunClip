@@ -217,6 +217,14 @@ if __name__ == "__main__":
             updates.append(gr.update(value=toggle_state))
         return updates
 
+    def on_textbox_focus(textbox_value, textbox_index, *checkbox_states):
+        """When a textbox gets focus, check its checkbox if the textbox has content."""
+        updates = list(checkbox_states)  # Keep existing states
+        # If the textbox has content, ensure its checkbox is checked
+        if textbox_value and textbox_value.strip():
+            updates[textbox_index] = True
+        return updates
+
     def collect_selected(*vals):
         """Collect checked subtitle texts and return them joined by '#' in id asc order."""
         if not vals:
@@ -253,47 +261,87 @@ if __name__ == "__main__":
         gr.HTML("""
             <style>
             /* Make generated rows align items center and reduce gap */
-            .generated-row { display: flex !important; align-items: center !important; gap: 8px !important; }
+            .generated-row { 
+                display: flex !important; 
+                align-items: center !important; 
+                gap: 8px !important;
+                padding: 4px !important;
+                border-radius: 4px !important;
+                transition: background-color 0.2s !important;
+            }
+            
+            .generated-row:hover {
+                background-color: rgba(0,0,0,0.05) !important;
+            }
 
             /* Style the select all row */
             .select-all-row { 
                 display: flex !important;
                 align-items: center !important;
-                padding: 8px !important;
-                margin-bottom: 8px !important;
-                background: #f5f5f5 !important;
-                border-radius: 4px !important;
+                padding: 12px !important;
+                margin-bottom: 12px !important;
+                background: #e9ecef !important;
+                border-radius: 6px !important;
+                border: 1px solid #ced4da !important;
             }
 
             /* Style the select all checkbox */
             .select-all-checkbox input[type="checkbox"] {
-                transform: scale(1.4);
-                accent-color: #333333;
+                transform: scale(1.5);
+                accent-color: #0056b3;
                 cursor: pointer;
                 margin-right: 8px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             }
 
             .select-all-checkbox label {
                 font-weight: 600;
-                color: #333;
+                color: #2c3e50;
             }
 
             /* Narrow checkbox column and center the checkbox inside it */
-            .generated-row .checkbox-col { display:flex; align-items:center; justify-content:center; width:40px; }
+            .generated-row .checkbox-col { 
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 44px;
+                padding: 0 4px;
+            }
 
-            /* Make the checkbox larger and darker (accent-color supported in modern browsers) */
+            /* Make checkboxes more visible with better contrast and bigger size */
             .generated-row .checkbox-col input[type="checkbox"] {
-                transform: scale(1.4);
-                accent-color: #333333;
-                margin: 0 4px;
+                transform: scale(1.5);
+                accent-color: #0056b3;
                 cursor: pointer;
+                margin: 0 4px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                border: 2px solid #0056b3;
+                border-radius: 4px;
+                position: relative;
+                opacity: 1 !important;
+            }
+
+            .generated-row .checkbox-col input[type="checkbox"]:checked {
+                background-color: #0056b3;
             }
 
             /* Give textbox column remaining space */
-            .generated-row .textbox-col { flex: 1 1 auto; }
+            .generated-row .textbox-col { 
+                flex: 1 1 auto;
+                cursor: text;
+            }
 
-            /* Slightly bolder textbox label/text for readability */
-            .generated-row .textbox-col label, .generated-row .textbox-col .gradio-textbox { font-weight: 500; }
+            /* Enhanced textbox styling */
+            .generated-row .textbox-col label, 
+            .generated-row .textbox-col .gradio-textbox { 
+                font-weight: 500;
+                color: #2c3e50;
+            }
+
+            .generated-row .textbox-col .gradio-textbox:focus-within {
+                border-color: #0056b3;
+                box-shadow: 0 0 0 1px #0056b3;
+            }
             </style>
         """)
         video_state, audio_state = gr.State(), gr.State()
@@ -341,7 +389,12 @@ if __name__ == "__main__":
                     # Use elem_classes to allow CSS centering and tighter layout.
                     with gr.Row(elem_classes="generated-row"):
                         chk = gr.Checkbox(label="", value=False, visible=False, scale=1, elem_classes="checkbox-col")
-                        tb = gr.Textbox(label=f"Line {i+1}", visible=False, scale=9, elem_classes="textbox-col")
+                        tb = gr.Textbox(label=f"Line {i+1}", visible=False, scale=9, elem_classes="textbox-col", 
+                                    elem_id=f"generated_textbox_{i}", interactive=True)
+                        # Focus event will auto-select checkbox when textbox has content
+                        tb.select(fn=lambda v, i=i: on_textbox_focus(v, i, *[c.value for c in generated_checks]),
+                                inputs=[tb] + generated_checks,
+                                outputs=generated_checks)
                     generated_checks.append(chk)
                     generated_textboxes.append(tb)
                 
