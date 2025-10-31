@@ -30,12 +30,14 @@ if __name__ == "__main__":
                                 vad_model="damo/speech_fsmn_vad_zh-cn-16k-common-pytorch",
                                 punc_model="damo/punc_ct-transformer_zh-cn-common-vocab272727-pytorch",
                                 spk_model="damo/speech_campplus_sv_zh-cn_16k-common",
+                                disable_update=True
                                 )
     else:
         funasr_model = AutoModel(model="iic/speech_paraformer_asr-en-16k-vocab4199-pytorch",
                                 vad_model="damo/speech_fsmn_vad_zh-cn-16k-common-pytorch",
                                 punc_model="damo/punc_ct-transformer_zh-cn-common-vocab272727-pytorch",
                                 spk_model="damo/speech_campplus_sv_zh-cn_16k-common",
+                                disable_update=True
                                 )
     audio_clipper = VideoClipper(funasr_model)
     audio_clipper.lang = args.lang
