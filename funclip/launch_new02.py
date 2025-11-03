@@ -151,7 +151,7 @@ if __name__ == "__main__":
                         output_dir = gr.Textbox(label="📁 文件输出路径 | File Output Dir (可以为空，Linux, mac系统可以稳定使用)", value=" ")
                         with gr.Row():
                             recog_button = gr.Button("👂 识别 | ASR", variant="primary")
-                            recog_button2 = gr.Button("👂👫 识别+区分说话人 | ASR+SD")
+                            # recog_button2 = gr.Button("👂👫 识别+区分说话人 | ASR+SD")
                 video_text_output = gr.Textbox(label="✏️ 识别结果 | Recognition Result", lines=10)
                 video_srt_output = gr.Textbox(label="📖 SRT字幕内容 | RST Subtitles", lines=10)
             with gr.Column():
@@ -201,9 +201,9 @@ if __name__ == "__main__":
         recog_button.click(mix_recog, 
                             inputs=[video_input,hotwords_input,output_dir],
                             outputs=[video_text_output,video_srt_output,video_state,audio_state])
-        recog_button2.click(mix_recog_speaker, 
-                            inputs=[video_input,hotwords_input,output_dir,],
-                            outputs=[video_text_output,video_srt_output,video_state])
+        # recog_button2.click(mix_recog_speaker, 
+        #                     inputs=[video_input,hotwords_input,output_dir,],
+        #                     outputs=[video_text_output,video_srt_output,video_state])
         clip_button.click(mix_clip, 
                             inputs=[video_text_input,video_spk_input,video_start_ost,video_end_ost,video_state,output_dir],
                             outputs=[video_output,clip_message,srt_clipped])
