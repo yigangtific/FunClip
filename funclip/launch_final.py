@@ -106,11 +106,11 @@ if __name__ == "__main__":
                 video_srt_output = gr.Textbox(label="📖 SRT字幕内容 | RST Subtitles", lines=10)
             with gr.Column():
                 with gr.Column("✂️ 根据文本/说话人裁剪 | Text/Speaker Clipping"):
-                    video_text_input = gr.Textbox(label="✏️ 待裁剪文本 | Text to Clip (多段文本使用'#'连接)")
-                    video_spk_input = gr.Textbox(label="✏️ 待裁剪说话人 | Speaker to Clip (多个说话人使用'#'连接)")
+                    video_text_input = gr.Textbox(label="✏️ 待裁剪文本 | Text to Clip (多段文本使用'#'连接)", lines=3)
+                    video_spk_input = gr.Textbox(label="✏️ 待裁剪说话人 | Speaker to Clip (多个说话人使用'#'连接)", visible=False)
                     with gr.Row():
                         clip_button = gr.Button("✂️ 裁剪 | Clip", variant="primary")
-                        clip_subti_button = gr.Button("✂️ 裁剪+字幕 | Clip+Subtitles")
+                        clip_subti_button = gr.Button("✂️ 裁剪+字幕 | Clip+Subtitles", variant="huggingface")
                     with gr.Column():
                         video_start_ost = gr.Slider(minimum=-500, maximum=1000, value=0, step=50, label="⏪ 开始位置偏移 | Start Offset (ms)")
                         video_end_ost = gr.Slider(minimum=-500, maximum=1000, value=100, step=50, label="⏩ 结束位置偏移 | End Offset (ms)")
