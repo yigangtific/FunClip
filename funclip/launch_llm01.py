@@ -119,7 +119,7 @@ if __name__ == "__main__":
                     prompt_head = gr.Textbox(label="Prompt System (按需更改，最好不要变动主体和要求)", value=("你是一个视频srt字幕分析剪辑器，输入视频的srt字幕，"
                             "分析其中的精彩且尽可能连续的片段并裁剪出来，输出四条以内的片段，将片段中在时间上连续的多个句子及它们的时间戳合并为一条，"
                             "注意确保文字与时间戳的正确匹配。输出需严格按照如下格式：1. [开始时间-结束时间] 文本，注意其中的连接符是“-”"))
-                    prompt_head2 = gr.Textbox(label="Prompt User（不需要修改，会自动拼接左下角的srt字幕）", value=("这是待裁剪的视频srt字幕：\n"), lines=4)
+                    prompt_head2 = gr.Textbox(label="Prompt User（不需要修改，会自动拼接左下角的srt字幕）", value="这是待裁剪的视频srt字幕：\n", lines=4)
                     with gr.Column():
                         with gr.Row():
                             llm_model = gr.Dropdown(
@@ -134,7 +134,7 @@ if __name__ == "__main__":
                                 value="qwen3-max",
                                 label="LLM Model Name",
                                 allow_custom_value=True)
-                            apikey_input = gr.Textbox(label="APIKEY", value=("sk-fce794a2b55d4eb6b8acd2f7567e3dbe"))
+                            apikey_input = gr.Textbox(label="APIKEY")
                         llm_button =  gr.Button("LLM推理 | LLM Inference（首先进行识别，非g4f需配置对应apikey）", variant="primary")
                     llm_result = gr.Textbox(label="LLM Clipper Result", lines=10)
                     with gr.Row():
