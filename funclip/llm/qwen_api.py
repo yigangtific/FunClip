@@ -3,7 +3,7 @@ from dashscope import Generation
 
 
 def call_qwen_model(key=None, 
-                    model="qwen_plus", 
+                    model="qwen3-max", 
                     user_content="如何做西红柿炖牛腩？", 
                     system_content=None):
     dashscope.api_key = key
@@ -27,4 +27,4 @@ def call_qwen_model(key=None,
 
 
 if __name__ == '__main__':
-    call_qwen_model('YOUR_BAILIAN_APIKEY')
+    call_qwen_model('sk-fce794a2b55d4eb6b8acd2f7567e3dbe')
